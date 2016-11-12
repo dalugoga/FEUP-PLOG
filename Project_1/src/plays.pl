@@ -88,7 +88,15 @@ possible_moves(B, X, Y, Res):-
 	checkEmpty(B, X, Y2, Res4),
 	group_lists(Res1, Res2, Res3, Res4, Res).
 
-
+find_units(Ls, Y, X, Yi, Xi, Cl,IncX,IncY,D,F,Cn):- Cn < 10,
+													Y > -1, 
+													Y < 9,
+													X > -1, 
+													X < 9,
+													Y2 is Y+IncY,
+													X2 is X+IncX,
+													index(Ls,Y2,X2, D), 
+													find_units(Ls, Y2, X2,Yi,Xi, [[X2|Y2]|Cl],IncX,IncY, D, F, Cn).
 	
 	
 bounds(-1, 0).
