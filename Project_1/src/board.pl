@@ -5,7 +5,7 @@
 board([	[-,-,r,r,'R',r,r,-,-],
 		[-,o,o,r,r,r,o,o,-],
 		[o,o,o,o,r,o,o,o,o],
-		[o,o,o,o,w,o,o,o,o],
+		[o,o,o,o,o,o,o,o,o],
 		[o,o,o,o,o,o,o,o,o],
 		[o,o,o,o,w,o,o,o,o],
 		[o,o,o,o,w,o,o,o,o],

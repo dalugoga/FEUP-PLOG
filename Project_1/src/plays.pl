@@ -66,6 +66,16 @@ group_lists(L1, L2, L3, L4, Res):-
 	append(R, R2, Temp),
 	group_list_into_pairs(Temp, Res).
 	
+group_lists(L1, L2, L3, L4,L5,L6,L7,L8, Res):-
+	append(L1, L2, R),
+	append(L3, L4, R2),
+	append(L5, L6, R3),
+	append(L7, L8, R4),
+	append(R , R2, Temp1),
+	append(R3, R4, Temp2),
+	append(Temp1, Temp2, Temp),
+	group_list_into_pairs(Temp, Res).
+	
 
 checkEmpty(B, X, Y, Res):-
 	index(B, Y, X, 'o'),
@@ -88,15 +98,57 @@ possible_moves(B, X, Y, Res):-
 	checkEmpty(B, X, Y2, Res4),
 	group_lists(Res1, Res2, Res3, Res4, Res).
 
-find_units(Ls, Y, X, Yi, Xi, Cl,IncX,IncY,D,F,Cn):- Cn < 10,
-													Y > -1, 
-													Y < 9,
-													X > -1, 
-													X < 9,
-													Y2 is Y+IncY,
-													X2 is X+IncX,
-													index(Ls,Y2,X2, D), 
-													find_units(Ls, Y2, X2,Yi,Xi, [[X2|Y2]|Cl],IncX,IncY, D, F, Cn).
+find_units(Ls, Y, X, Clf,Cl,IncX,IncY,D,F):- 			
+	Y > -1, 
+	Y < 9,
+	X > -1, 
+	X < 9,
+	Y2 is Y+IncY,
+	X2 is X+IncX,
+	index(Ls,Y2,X2, D),
+	append([X2,Y2],Cl,Cl2),
+	find_units(Ls, Y2, X2,Clf,Cl2,IncX,IncY, D, F).
+	
+find_units(Ls, Y, X, Clf,Cl,IncX,IncY,D,F):- 			
+	Y > -1, 
+	Y < 9,
+	X > -1, 
+	X < 9,
+	Y2 is Y+IncY,
+	X2 is X+IncX,
+	index(Ls,Y2,X2, F),
+	append(Cl,[],Clf),
+	write(Clf),
+	nl.
+	
+find_units(Ls, Y, X, Clf,Cl,IncX,IncY,D,F):- 			
+	Y > -1, 
+	Y < 9,
+	X > -1, 
+	X < 9,
+	Y2 is Y+IncY,
+	X2 is X+IncX,
+	E \== D,
+	E \== F,
+	index(Ls,Y2,X2, E),
+	find_units(Ls, Y2, X2,Clf,Cl,IncX,IncY, D, F).
+
+find_units(Ls, Y, X,Clf, Cl,IncX,IncY,D,F):- 
+	append(Cl,[],Clf).
+	
+find_my_units(Ls, Cl,X,Y,D,F):- 
+	find_units(Ls, Y, X,Cl1,[],+1,0,D,F),
+	find_units(Ls, Y, X,Cl2,[],-1,0,D,F),
+	find_units(Ls, Y, X,Cl3,[],0,+1,D,F),
+	find_units(Ls, Y, X,Cl4,[],0,-1,D,F),
+	find_units(Ls, Y, X,Cl5,[],+1,+1,D,F),
+	find_units(Ls, Y, X,Cl6,[],-1,+1,D,F),
+	find_units(Ls, Y, X,Cl7,[],+1,-1,D,F),
+	find_units(Ls, Y, X,Cl8,[],-1,-1,D,F),
+	group_lists(Cl1, Cl2, Cl3, Cl4,Cl5,Cl6,Cl7,Cl8, Cl)
+	.
+	
+
 	
 	
 bounds(-1, 0).
