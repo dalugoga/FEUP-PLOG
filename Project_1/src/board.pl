@@ -1,7 +1,9 @@
 :- use_module(library(lists)).
 :- use_module(library(sets)).
+:- use_module(library(random)).
 :- consult('plays.pl').
 :-consult('menus.pl').
+
 
 
 

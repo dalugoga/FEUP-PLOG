@@ -34,7 +34,7 @@ text_menu:-
 	read_char('Enter a valid option', C),
 	menu_handler(C).	
 	
-menu_handler('1'):- write('menu1').
+menu_handler('1'):- start.
 menu_handler('2'):- write('EXITING..').
 menu_handler(_):- text_menu.
 	
