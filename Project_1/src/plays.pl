@@ -169,32 +169,65 @@ player_cicle(B, _,'W', A):- A = B.
 player_cicle(B, P, _, A):- 
 	write(P), write(' turn'), nl,
 	draw(B),
-	get_piece_coords(X, Y), 
+	get_unit(P,D),
+	get_enemy_unit(P,F),
+	find_active_units(B, D, F, Res2),
+	write('active units'),
+	write_list(Res2,4), nl,
+	unit_checker(X2,Y2,Res2,X,Y),
 	possible_moves(B, X, Y, Res), 
 	write('possible moves for that piece: '),
 	write(Res), nl,
-	get_move_coords(X1, Y1), 
-	Dx is X1 - X,
-	Dy is Y1 - Y,
+	move_checker(X1,Y1,Res, Xf, Yf),
+	Dx is Xf - X,
+	Dy is Yf - Y,
 	movePiece(B, Y, X, Dx, Dy, NB, Val),
 	write(Val),nl,
 	player_cicle(NB, P, Val, A).
+
+get_unit('R',r).
+get_unit('W',w).
+get_enemy_unit('R',w).
+get_enemy_unit('W',r).
+	
+move_checker(Xt,Yt,Res, Xf, Yf):-
+	get_move_coords(Xt, Yt),
+	member([Xt,Yt], Res),
+	Xf = Xt,
+	Yf = Yt.
+	
+move_checker(_, _,Res, Xf, Yf):- 
+	write('stop being stupid'),
+	nl,
+	move_checker(_,_, Res, Xf, Yf).
+	
+unit_checker(Xt,Yt,Res, Xf, Yf):-
+	get_piece_coords(Xt,Yt), 
+	member([Xt,Yt], Res),
+	Xf = Xt,
+	Yf = Yt.	
+	
+unit_checker(_,_,Res, Xf, Yf):-
+	write('stop being stupid V2'),
+	nl,
+	unit_checker(_,_,Res, Xf, Yf).
 	
 	
 find_active_units(B, D, F, Res):-
-	index(B, Xw, Yw, 'W'),
-	index(B, Xr, Yr, 'R'),
+	get_unit(T1,D),
+	get_unit(T2,F),
+	index(B, Xw, Yw, T1),
+	index(B, Xr, Yr, T2),
 	find_my_units(B, Clw, Yw, Xw, D, F),
 	find_my_units(B, Clr, Yr, Xr, D, F),
 	append(Clw, Clr, Cl),
-	list_to_set(Cl, Res), nl,
-	write('Units que podem mexer: '),
-	write_list(Res, 4).
+	append([[Yw, Xw]], Cl, Clf),
+	list_to_set(Clf, Res).
 	
 write_list([], _).
 
 write_list(L, 0):-
-	nl, write('                       '), write_list(L, 4).
+	nl, write('            '), write_list(L, 4).
 
 write_list([L|Ls], N):-
 	write(L), write('  '),
@@ -203,19 +236,15 @@ write_list([L|Ls], N):-
 	
 %the game cicle
 %game_cicle(Board).
-/*
-gameCicle([]).
-game_cicle(B):-
-	player_cicle(B, 'W', ' ', NB1), 
-	(checkLose(NB1, 'R') -> gameCicle([]) ; true),
-	nl, write('----------------------------'), nl,
-	player_cicle(NB1, 'R', ' ', NB2), 
-	(checkLose(NB2, 'W') -> gameCicle([]) ; true),
-	nl, write('----------------------------'), nl,
-	game_cicle(NB2).
-*/
 
-game_cicle()
+game_cicle(_, _, _, 1).
+
+game_cicle(B, N, E, 0):-
+	player_cicle(B, N, ' ', NB),
+	(checkLose(NB, E) -> game_cicle(NB, N, E, 1) ; game_cicle(NB, E, N, 0)).
+
+
+
 	
 	
 bounds(-1, 0).
