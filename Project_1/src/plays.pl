@@ -112,7 +112,7 @@ find_units(Ls, Y, X, Clf,Cl,IncX,IncY,D,F):-
 	append([X2,Y2],Cl,Cl2),
 	find_units(Ls, Y2, X2,Clf,Cl2,IncX,IncY, D, F).
 	
-find_units(Ls, Y, X, Clf,Cl,IncX,IncY,_,F):- 			
+find_units(Ls, Y, X, Clf,Cl,IncX,IncY,_,F):- 		
 	Y > -1, 
 	Y < 9,
 	X > -1, 
@@ -120,7 +120,9 @@ find_units(Ls, Y, X, Clf,Cl,IncX,IncY,_,F):-
 	Y2 is Y+IncY,
 	X2 is X+IncX,
 	index(Ls,Y2,X2, F),
-	append(Cl,[],Clf).
+	append(Cl,[],Clf),
+	write(Clf),
+	nl.
 	
 find_units(Ls, Y, X, Clf,Cl,IncX,IncY,D,F):- 			
 	Y > -1, 
@@ -149,6 +151,7 @@ find_my_units(Ls, Cl,X,Y,D,F):-
 	group_lists(Cl1, Cl2, Cl3, Cl4,Cl5,Cl6,Cl7,Cl8, Cl)
 	.
 	
+
 get_piece_coords(X, Y):-
 	write('insert x coord of piece to move(0-8) ex:5. '),
 	read(X),
@@ -215,7 +218,7 @@ game_cicle(B):-
 	game_cicle(NB2).
 */
 
-game_cicle()
+
 	
 	
 bounds(-1, 0).
