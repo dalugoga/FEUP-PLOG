@@ -38,20 +38,15 @@ checkEnemy(w, 'R').
 checkLose(B, Node):-
 	checkEnemy(Node, Enemy),
 	index(B, Row, Col, Node),
-	write(1), nl,
 	Row1 is Row +1,
 	(Row1 < 9 -> (index(B, Row1, Col, Enemy); index(B, Row1, Col, '-'));true),
-	write(2), nl,
 	Col1 is Col +1,
 	(Col1 < 9 -> (index(B, Row, Col1, Enemy); index(B, Row, Col1, '-'));true),
-	write(3), nl,
 	Row2 is Row -1,
 	(Row2 >= 0 -> (index(B, Row2, Col, Enemy); index(B, Row2, Col, '-'));true),
-	write(4), nl,
 	Col2 is Col -1,
 	(Col2 >= 0 -> (index(B, Row, Col2, Enemy); index(B, Row, Col2, '-'));true),
-	write(Node),
-	write(' Loses'), nl .
+	write(Node), write(' Loses'), nl .
 
 %possible_moves(Board, Xcoord, Ycoord, List of Pairs).
 %List of Pairs has the coordinates to where the unit can go
@@ -162,27 +157,34 @@ get_move_coords(X, Y):-
 	read(Y).
 
 
-
+write_turn(P):-
+	write_space, 
+	write_space,
+	write_space, 
+	write(P), 
+	write(' turn'), 
+	nl, nl .
+	
 player_cicle(B, _,'R', A):- A = B.
 player_cicle(B, _,'W', A):- A = B.
 
 player_cicle(B, P, _, A):- 
-	write(P), write(' turn'), nl,
+	clear_console(30),
+	write_turn(P),
 	draw(B),
 	get_unit(P,D),
 	get_enemy_unit(P,F),
 	find_active_units(B, D, F, Res2),
-	write('active units'),
+	write('active units: '),
 	write_list(Res2,4), nl,
-	unit_checker(X2,Y2,Res2,X,Y),
-	possible_moves(B, X, Y, Res), 
+	unit_checker(_,_,Res2,X,Y),
+	nl, possible_moves(B, X, Y, Res), 
 	write('possible moves for that piece: '),
 	write(Res), nl,
-	move_checker(X1,Y1,Res, Xf, Yf),
+	move_checker(_,_,Res, Xf, Yf, X, Y),
 	Dx is Xf - X,
 	Dy is Yf - Y,
 	movePiece(B, Y, X, Dx, Dy, NB, Val),
-	write(Val),nl,
 	player_cicle(NB, P, Val, A).
 
 get_unit('R',r).
@@ -190,16 +192,23 @@ get_unit('W',w).
 get_enemy_unit('R',w).
 get_enemy_unit('W',r).
 	
-move_checker(Xt,Yt,Res, Xf, Yf):-
+move_checker(_, _,[], Xf, Yf, X, Y):-
+	Xf = X,
+	Yf = Y.
+	
+move_checker(Xt,Yt,Res, Xf, Yf, _, _):-
 	get_move_coords(Xt, Yt),
 	member([Xt,Yt], Res),
 	Xf = Xt,
 	Yf = Yt.
 	
-move_checker(_, _,Res, Xf, Yf):- 
-	write('stop being stupid'),
+move_checker(_, _,Res, Xf, Yf, _, _):- 
 	nl,
-	move_checker(_,_, Res, Xf, Yf).
+	write('Chose a pair of coordinates from the list above'),
+	nl,
+	move_checker(_,_, Res, Xf, Yf, _, _).
+
+
 	
 unit_checker(Xt,Yt,Res, Xf, Yf):-
 	get_piece_coords(Xt,Yt), 
@@ -208,7 +217,8 @@ unit_checker(Xt,Yt,Res, Xf, Yf):-
 	Yf = Yt.	
 	
 unit_checker(_,_,Res, Xf, Yf):-
-	write('stop being stupid V2'),
+	nl,
+	write('Chose a pair of coordinates from the list above'),
 	nl,
 	unit_checker(_,_,Res, Xf, Yf).
 	
@@ -224,10 +234,11 @@ find_active_units(B, D, F, Res):-
 	append([[Yw, Xw]], Cl, Clf),
 	list_to_set(Clf, Res).
 	
-write_list([], _).
+write_list([], _):- nl .
 
 write_list(L, 0):-
-	nl, write('            '), write_list(L, 4).
+	nl, write('              '), 
+	write_list(L, 4).
 
 write_list([L|Ls], N):-
 	write(L), write('  '),
@@ -240,6 +251,7 @@ write_list([L|Ls], N):-
 game_cicle(_, _, _, 1).
 
 game_cicle(B, N, E, 0):-
+	clear_console(30),
 	player_cicle(B, N, ' ', NB),
 	(checkLose(NB, E) -> game_cicle(NB, N, E, 1) ; game_cicle(NB, E, N, 0)).
 
@@ -260,4 +272,4 @@ draw:- board(B), vertical_coords, nl, nl, display_board(B, 1).
 draw(B):- vertical_coords, nl, nl, display_board(B, 1).
 win:- board(B), checkLose(B, 'W').
 moves(X, Y):- board(B), possible_moves(B, X, Y, Res), write(Res). 
-start:- board(B), game_cicle(B).
+start:- board(B), game_cicle(B, 'W', 'R', 0).
