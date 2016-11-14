@@ -1,10 +1,3 @@
-:- use_module(library(lists)).
-:- use_module(library(sets)).
-:- use_module(library(random)).
-:- use_module(library(system)).
-:- consult('plays.pl').
-:- consult('menus.pl').
-
 
 board([	[-,-,r,r,'R',r,r,-,-],
 		[-,o,o,r,r,r,o,o,-],
