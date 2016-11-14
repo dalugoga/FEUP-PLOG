@@ -15,7 +15,10 @@ replace( L , X , Y , Z , R ):-
   append(ColPfx,[Z|ColSfx],RowNew) ,
   append(RowPfx,[RowNew|RowSfx],R).
 
-
+movePiece(B, _, _, 0, 0, NB, Val):-
+	NB = B,
+	Val = ' '.
+	
 movePiece(B, Yi, Xi, Dx, Dy, NB, Val):-
 	index(B, Yi, Xi, Val),
 	replace(B, Yi, Xi, 'o', B1),
@@ -165,9 +168,56 @@ write_turn(P):-
 	write(' turn'), 
 	nl, nl .
 	
+get_random_from_list([], X, Y, Xu, Yu):-
+	X = Xu,
+	Y = Yu.
+	
+get_random_from_list(List, X, Y, _, _):-
+	proper_length(List, L),
+	random(0, L, R),
+	nth0(R, List, P),
+	nth0(0, P, X),
+	nth0(1, P, Y).
+	
 player_cicle(B, _,'R', A):- A = B.
 player_cicle(B, _,'W', A):- A = B.
 
+
+player_cicle(B, 'CPU2', _, A):- 
+	P = 'W',
+	clear_console(30),
+	write_turn('CPU2'),
+	draw(B),
+	%sleep(3),
+	get_unit(P,D),
+	get_enemy_unit(P,F),
+	find_active_units(B, D, F, Res2),
+	get_random_from_list(Res2, X, Y, _, _),
+	possible_moves(B, X, Y, Res), 
+	get_random_from_list(Res, Xf, Yf, X, Y),
+	Dx is Xf - X,
+	Dy is Yf - Y,
+	movePiece(B, Y, X, Dx, Dy, NB, Val),
+	player_cicle(NB, 'CPU2', Val, A).
+	
+	
+player_cicle(B, 'CPU1', _, A):- 
+	P = 'R',
+	clear_console(30),
+	write_turn('CPU1'),
+	draw(B),
+	%sleep(3),
+	get_unit(P,D),
+	get_enemy_unit(P,F),
+	find_active_units(B, D, F, Res2),
+	get_random_from_list(Res2, X, Y, _, _),
+	possible_moves(B, X, Y, Res), 
+	get_random_from_list(Res, Xf, Yf, X, Y),
+	Dx is Xf - X,
+	Dy is Yf - Y,
+	movePiece(B, Y, X, Dx, Dy, NB, Val),
+	player_cicle(NB, 'CPU1', Val, A).
+	
 player_cicle(B, P, _, A):- 
 	clear_console(30),
 	write_turn(P),
@@ -248,20 +298,27 @@ write_list([L|Ls], N):-
 %the game cicle
 %game_cicle(Board).
 
+get_node_cpu('CPU1', 'R').
+get_node_cpu('CPU2', 'W').
+get_node_cpu(X, X).
+
 game_cicle(_, _, _, 1).
 
 game_cicle(B, N, E, 0):-
 	clear_console(30),
 	player_cicle(B, N, ' ', NB),
-	(checkLose(NB, E) -> game_cicle(NB, N, E, 1) ; game_cicle(NB, E, N, 0)).
-
-
-
+	get_node_cpu(E, Ee),
+	(checkLose(NB, Ee) -> game_cicle(NB, N, E, 1) ; game_cicle(NB, E, N, 0)).
 	
 	
 bounds(-1, 0).
 bounds(9, 8).
 bounds(X,X).
+
+start_PvP:- board(B), game_cicle(B, 'W', 'R', 0).
+start_PvCPU1:- board(B), game_cicle(B, 'W', 'CPU1', 0).
+start_CPU2vCPU1:- board(B), game_cicle(B, 'CPU2', 'CPU1', 0).
+
 %%%%%%%%
 %testes%
 %%%%%%%%
@@ -272,4 +329,5 @@ draw:- board(B), vertical_coords, nl, nl, display_board(B, 1).
 draw(B):- vertical_coords, nl, nl, display_board(B, 1).
 win:- board(B), checkLose(B, 'W').
 moves(X, Y):- board(B), possible_moves(B, X, Y, Res), write(Res). 
-start:- board(B), game_cicle(B, 'W', 'R', 0).
+
+

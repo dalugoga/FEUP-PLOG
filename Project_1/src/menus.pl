@@ -29,13 +29,17 @@ read_char(Message, X):-
 text_menu:-
 	clear_console(30), nl,
 	menu_ascii_art,
-	write_space, write('1 - jogar'),nl,
-	write_space, write('2 - sair'),nl,
-	read_char('Enter a valid option', C),
+	write_space, write('1 - player vs player'),nl,
+	write_space, write('2 - player vs cpu'),nl,
+	write_space, write('3 - cpu vs cpu'),nl,
+	write_space, write('4 - exit'),nl,
+	read_char('Introduza uma opcao valida', C),
 	menu_handler(C).	
 	
-menu_handler('1'):- start.
-menu_handler('2'):- write('EXITING..').
+menu_handler('1'):- start_PvP.
+menu_handler('2'):- start_PvCPU1.
+menu_handler('3'):- start_CPU2vCPU1.
+menu_handler('4'):- write('EXITING..').
 menu_handler(_):- text_menu.
 	
 	

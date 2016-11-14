@@ -1,33 +1,20 @@
 :- use_module(library(lists)).
 :- use_module(library(sets)).
 :- use_module(library(random)).
+:- use_module(library(system)).
 :- consult('plays.pl').
-:-consult('menus.pl').
+:- consult('menus.pl').
 
 
-
-
-/*
-board([	[-,-,r,r,r,r,r,-,-],
-		[-,o,o,r,r,r,o,o,-],
-		[o,o,o,o,r,o,o,o,o],
-		[o,o,o,o,w,o,o,o,o],
-		[o,o,o,o,o,o,o,o,o],
-		[r,o,o,o,w,o,o,o,o],
-		['W',o,o,o,w,o,o,o,o],
-		[-,o,o,w,w,w,o,o,-],
-		[-,-,w,o,'R',w,w,-,-]
-		]).
-*/
-board([	[-,-,r,r,o,r,r,-,-],
+board([	[-,-,r,r,'R',r,r,-,-],
 		[-,o,o,r,r,r,o,o,-],
 		[o,o,o,o,r,o,o,o,o],
 		[o,o,o,o,o,o,o,o,o],
-		[o,o,'W',o,o,o,o,o,o],
+		[o,o,o,o,o,o,o,o,o],
 		[o,o,o,o,o,o,o,o,o],
 		[o,o,o,o,w,o,o,o,o],
 		[-,o,o,w,w,w,o,o,-],
-		[-,-,w,w,'R',o,w,-,-]
+		[-,-,w,w,'W',w,w,-,-]
 		]).	
 		
 vertical_coords:- write('   0  1  2  3  4  5  6  7  8').
