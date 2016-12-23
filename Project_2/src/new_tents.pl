@@ -1,82 +1,168 @@
 :-use_module(library(clpfd)).
 :-use_module(library(lists)).
 :-use_module(library(sets)).
+:-use_module(library(between)).
 
-%dados
-/*
+
 tree(2, 1).
-tree(4, 2).
-tree(2, 3).
-tree(4, 4).
-tree(6, 4).
-tree(1, 5).
-tree(2, 5).
-tree(4, 6).
-
-column(1, 3).
-column(6, 1).
-
-row(1, 2).
-row(6, 2).
-
-size(6).
-*/
-
-tree(3, 1).
 tree(6, 1).
-tree(1, 2).
-tree(2, 3).
+tree(11, 1).
+tree(8, 2).
+tree(12, 2).
+tree(1, 3).
 tree(5, 3).
-tree(4, 5).
-tree(1, 6).
-tree(4, 6).
-tree(7, 7).
+tree(11, 3).
+tree(12, 3).
+tree(7, 4).
+tree(8, 5).
+tree(10, 5).
+tree(12, 5).
+tree(3, 6).
+tree(3, 7).
+tree(4, 7).
+tree(1, 8).
+tree(5, 8).
+tree(7, 8).
+tree(9, 8).
+tree(12, 8).
+tree(3, 10).
+tree(10, 10).
+tree(6, 11).
+tree(10, 11).
+tree(2, 12).
+tree(4, 12).
+tree(12, 12).
 
-column(1, 1).
+column(1, 2).
 column(2, 2).
-column(3, 1).
-column(4, 2).
-column(5, 1).
-column(6, 1).
+column(3, 4).
+column(4, 1).
+column(5, 2).
+column(6, 3).
 column(7, 1).
+column(8, 2).
+column(9, 1).
+column(10, 5).
+column(11, 0).
+column(12, 5).
 
-row(1, 2).
+row(1, 4).
 row(2, 1).
-row(3, 1).
-row(4, 1).
+row(3, 3).
+row(4, 2).
 row(5, 1).
-row(6, 1).
+row(6, 3).
 row(7, 2).
+row(8, 1).
+row(9, 5).
+row(10, 1).
+row(11, 1).
+row(12, 4).
 
-size(7).
-
-
+size(12).
 %___________________________________________________
 
+writeRowClue(Y):-
+	row(Y, Value),
+	write(Value).
+	
+writeRowClue(_).
 
+
+writeColumnClue(X, SS):-
+	X == SS.
+
+writeColumnClue(X, SS):-
+	column(X, Value),
+	write('  '),
+	write(Value),
+	write(' '),
+	X1 is X + 1,
+	writeColumnClue(X1, SS).
+	
+writeColumnClue(X, SS):-
+	write('    '),
+	X1 is X + 1,
+	writeColumnClue(X1, SS).
+
+	
 display(_, _, Y, SS):-
 	Y == SS.
 
 display(L, X, Y, SS):-
 	X == SS,
+	size(S),
 	Y1 is Y + 1,
-	nl,
-	d(L, 1, Y1, SS).
+	write('| '),
+	writeRowClue(Y),
+	writeDivision(S),
+	display(L, 1, Y1, SS).
 	
 display(L, X, Y, SS):-
 	tree(X, Y),
-	write('T'),
-	write('  '),
+	write('|'),
+	write(' T '),
 	X1 is X + 1,
-	d(L, X1, Y, SS).
+	display(L, X1, Y, SS).
 	
 display(L, X, Y, SS):-
 	coordsToIndice(X, Y, I),
 	nth1(I, L, Value),
-	write(Value),
+	Value == 1,
+	write('|'),
+	write('/l'),
+	write(''\''),
+	X1 is X + 1,
+	display(L, X1, Y, SS).
+	
+display(L, X, Y, SS):-
+	coordsToIndice(X, Y, I),
+	nth1(I, L, Value),
+	Value == 0,
+	write('|'),
+	write(' '),
 	write('  '),
 	X1 is X + 1,
-	d(L, X1, Y, SS).
+	display(L, X1, Y, SS).
+	
+
+writeDivisionNTimes(0).
+	
+writeDivisionNTimes(N):-
+	write('---+'),
+	N1 is N - 1,
+	writeDivisionNTimes(N1).
+	
+writeDivision(N):-
+	nl,
+	write('+'),
+	writeDivisionNTimes(N),
+	nl.
+	
+displayBoard(L):-
+	size(S),
+	SS is S + 1,
+	writeDivision(S),
+	display(L, 1, 1, SS),
+	writeColumnClue(1, SS),
+	nl, nl, nl.
+	
+displaySolvedBoard(L):-
+	nl,
+	write('Solved Board'), 
+	nl,
+	displayBoard(L).
+	
+displayEmptyBoard:-
+	nl,nl,
+	write('Board to solve'), 
+	nl,
+	size(S),
+	SSS is S * S,
+	findall(0, between(1, SSS, _), L),
+	displayBoard(L).
+	
+	
 	
 
 %___________________________________________________
@@ -299,22 +385,31 @@ noTentsInTrees(L, [X-Y|Trees]):-
 	
 %____________________________________________________
 tents:-
+	displayEmptyBoard,
+	statistics(walltime, [_ | [_]]),
 	size(S),
-	SS is S + 1,
 	SSS is S * S,
 	length(L, SSS),
 	domain(L, 0, 1),
+	tentsSolver(L, S),
+	labeling([], L),
+	statistics(walltime, [_ | [ExecutionTime]]),
+	displaySolvedBoard(L),
+	writeExecutionTime(ExecutionTime),
+	fd_statistics.
+
+tentsSolver(L, S):-
 	equals(L),
 	findall(X-Y, tree(X, Y), Trees),
 	allTrees(L, Trees),
 	gridValuesRestriction(L),
 	noTentsInTrees(L, Trees),
 	search2x2(L, 1, 1, S),
-	findAllFriends(L, Trees, Trees),
-	labeling([], L),
-	nl,nl,
-	display(L, 1, 1, SS),
-	nl,nl,
-	write(L).
-
-test:- length(L, 10), append(L, L, M), list_to_set(M, P), write(P).
+	findAllFriends(L, Trees, Trees).
+	
+writeExecutionTime(ExecutionTime):-
+	write('Execution took '), 
+	write(ExecutionTime), 
+	write(' ms.'), 
+	nl, nl.
+	
